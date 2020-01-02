@@ -18,26 +18,7 @@
 
 package org.eclipse.leshan.client.demo;
 
-import static org.eclipse.leshan.LwM2mId.*;
-import static org.eclipse.leshan.client.object.Security.*;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPublicKey;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.leshan.LwM2m;
 import org.eclipse.leshan.client.californium.LeshanClient;
@@ -54,11 +35,39 @@ import org.eclipse.leshan.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+
+import static org.eclipse.leshan.LwM2mId.*;
+import static org.eclipse.leshan.client.object.Security.*;
+
 public class LeshanClientDemo {
 
     private static final Logger LOG = LoggerFactory.getLogger(LeshanClientDemo.class);
 
-    private final static String[] modelPaths = new String[] { "3303.xml" };
+    private final static String[] modelPaths = new String[]{"3303.xml",
+            //Our added tags
+            "6.xml", "3314.xml", "3341.xml", "3345.xml", "32700.xml", "32701.xml", "32702.xml"};
+
+
+    //Our constants corresponding to the xml files
+    private static final int OBJECT_ID_LOCATION = 6;
+    private static final int OBJECT_ID_MAGNETOMETER = 3314;
+    private static final int OBJECT_ID_ADDRESSABLE_TEXT_DISPLAY = 3341;
+    private static final int OBJECT_ID_MULTIPLE_AXIS_JOYSTICK = 3345;
+    private static final int OBJECT_ID_PARKING_SPOT = 32700;
+    private static final int OBJECT_ID_VEHICLE_COUNTER = 32701;
+    private static final int OBJECT_ID_PARKING_LOT = 32702;
+
 
     private static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
     private final static String DEFAULT_ENDPOINT = "LeshanClientDemo";
@@ -361,6 +370,17 @@ public class LeshanClientDemo {
         initializer.setInstancesForObject(DEVICE, new MyDevice());
         initializer.setInstancesForObject(LOCATION, locationInstance);
         initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
+
+        //Added
+        //initializer.setInstancesForObject(OBJECT_ID_LOCATION, new Location());
+        initializer.setInstancesForObject(OBJECT_ID_MAGNETOMETER, new Magnetometer());
+        initializer.setInstancesForObject(OBJECT_ID_ADDRESSABLE_TEXT_DISPLAY, new AddressableTextDisplay());
+        initializer.setInstancesForObject(OBJECT_ID_MULTIPLE_AXIS_JOYSTICK, new MultipleAxisJoystick());
+        initializer.setInstancesForObject(OBJECT_ID_PARKING_SPOT, new ParkingSpot());
+        initializer.setInstancesForObject(OBJECT_ID_VEHICLE_COUNTER, new VehicleCounter());
+        initializer.setInstancesForObject(OBJECT_ID_PARKING_LOT, new ParkingLot());
+
+
         List<LwM2mObjectEnabler> enablers = initializer.createAll();
 
         // Create CoAP Config
