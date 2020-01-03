@@ -115,7 +115,9 @@ public class LeshanServerDemo {
                             "LWM2M_Bearer_selection-v1_0.xml", "LWM2M_Portfolio-v1_0.xml", "LWM2M_DevCapMgmt-v1_0.xml",
                             "LWM2M_Software_Component-v1_0.xml", "LWM2M_Software_Management-v1_0.xml",
 
-                            "Non-Access_Stratum_NAS_configuration-V1_0.xml" };
+                            "Non-Access_Stratum_NAS_configuration-V1_0.xml",
+				//My added files
+				"32700.xml","32701.xml","32702.xml","3314.xml","3341.xml","3345.xml","6.xml" };
 
     private final static String USAGE = "java -jar leshan-server-demo.jar [OPTION]\n\n";
 
