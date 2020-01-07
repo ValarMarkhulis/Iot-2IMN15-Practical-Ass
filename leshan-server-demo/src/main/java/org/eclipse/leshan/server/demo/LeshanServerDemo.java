@@ -436,5 +436,21 @@ public class LeshanServerDemo {
         lwServer.start();
         server.start();
         LOG.info("Web server started at {}.", server.getURI());
+
+        Thread AvahiPublishThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Runtime.getRuntime().exec(new String[]{"/bin/sh","-c",
+                            "avahi-publish-service parkingserver_unSecureCoAP _parkingserver._udp 5683",
+                            "avahi-publish-service parkingserver_SecureCoAP _parkingserver._udp 5684",
+                            "avahi-publish-service parkingserver_webServer _parkingserver._udp 8080"});
+                    //Runtime.getRuntime().exec("");
+                    //Runtime.getRuntime().exec("");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        AvahiPublishThread.start();
     }
 }

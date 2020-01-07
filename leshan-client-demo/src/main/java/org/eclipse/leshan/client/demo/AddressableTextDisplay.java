@@ -9,8 +9,11 @@ import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class AddressableTextDisplay extends BaseInstanceEnabler {
     // Static values for resource items
@@ -51,9 +54,17 @@ public class AddressableTextDisplay extends BaseInstanceEnabler {
     Our code
      */
     private String Command;
+    private boolean isRPI = false;
 
     public AddressableTextDisplay() {
 
+        try {
+            if(InetAddress.getLocalHost().getHostName().contains("IoT-pi42")){
+                isRPI = true;
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -85,6 +96,8 @@ public class AddressableTextDisplay extends BaseInstanceEnabler {
         switch (resourceId) {
             case RES_TEXT:
                 Command = "Text_is_" + value.getValue().toString().replace(" ", "_");
+                Command.concat(" --stdout | aplay");
+                callPythonScript();
                 try {
                     Process p = Runtime.getRuntime().exec("espeak " + Command);
                 } catch (IOException e) {
@@ -95,6 +108,7 @@ public class AddressableTextDisplay extends BaseInstanceEnabler {
                 return WriteResponse.success();
             case RES_X_COORDINATE:
                 Command = "x_is_" + value.getValue().toString();
+                Command.concat(" --stdout | aplay");
                 try {
                     Process p = Runtime.getRuntime().exec("espeak " + Command);
                 } catch (IOException e) {
@@ -146,6 +160,29 @@ public class AddressableTextDisplay extends BaseInstanceEnabler {
             default:
                 return super.write(identity, resourceId, value);
         }
+    }
+
+    private void callPythonScript() {
+        Thread joystickReader;
+
+        joystickReader = new Thread(new Runnable() {
+            public void run() {          Process p = null;
+                try {
+                    p = Runtime.getRuntime().exec("python /home/chris/IdeaProjects/LegeLand/testText2Spe.py");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Scanner scanner = new Scanner(p.getInputStream());
+                while (scanner.hasNext()) {
+                    String line = scanner.next();
+                    System.out.println(line);
+                    // process the content of line.
+                    if(line.matches("test!")){
+                        //doSomething();
+                    }
+                } }
+        });
+        joystickReader.start();
     }
 
     @Override
@@ -225,5 +262,7 @@ public class AddressableTextDisplay extends BaseInstanceEnabler {
             fireResourcesChange(RES_APPLICATION_TYPE);
         }
     }
+
+
 
 }
