@@ -8,8 +8,10 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class ParkingSpot extends BaseInstanceEnabler {
     // Static values for resource items
@@ -25,7 +27,8 @@ public class ParkingSpot extends BaseInstanceEnabler {
     // Variables storing current values.
     private String vParkingSpotId = "";
     // Free,Reserved,Occupied
-    private String vParkingSpotState = "";
+    private final String[] SpotStates = new String[]{"free","reserved","occupied"};
+    private String vParkingSpotState = "free";
     private String vLotName = "";
 
     public ParkingSpot() {
@@ -49,9 +52,60 @@ public class ParkingSpot extends BaseInstanceEnabler {
     public WriteResponse write(ServerIdentity identity, int resourceId, LwM2mResource value) {
         switch (resourceId) {
             case RES_PARKING_SPOT_STATE:
-                vParkingSpotState = (String) value.getValue();
-                fireResourcesChange(resourceId);
-                return WriteResponse.success();
+                String vParkingSpotState_temp = ((String) value.getValue()).toLowerCase();
+                for (String s: SpotStates)
+                {
+                    if(s.equals(vParkingSpotState_temp)){
+                        vParkingSpotState = vParkingSpotState_temp;
+                        fireResourcesChange(resourceId);
+                        try {
+                            Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + vParkingSpotState+"");
+                            switch (vParkingSpotState){
+                                case "free":
+                                    System.out.println("I am here1!!");
+                                    Process p2 = Runtime.getRuntime().exec("" +
+                                            "python /home/"+System.getProperty("user.name")+"/PythonScriptsIoT/LEDmatrixStatusGREEN.py");
+                                    Scanner Errorscanner = new Scanner(p2.getErrorStream());
+
+                                    while (Errorscanner.hasNext()) {
+                                        String line2 = Errorscanner.next();
+                                        System.err.println(line2);
+                                    }
+                                    break;
+                                case "reserved":
+                                    System.out.println("I am here2!!");
+                                    p2 = Runtime.getRuntime().exec("" +
+                                            "python /home/"+System.getProperty("user.name")+"/PythonScriptsIoT/LEDmatrixStatusORANGE.py");
+                                    Errorscanner = new Scanner(p2.getErrorStream());
+
+                                    while (Errorscanner.hasNext()) {
+                                        String line2 = Errorscanner.next();
+                                        System.err.println(line2);
+                                    }
+                                    break;
+                                case "occupied":
+                                    System.out.println("I am here3!!");
+                                    p2 = Runtime.getRuntime().exec("" +
+                                            "python /home/"+System.getProperty("user.name")+"/PythonScriptsIoT/LEDmatrixStatusRED.py");
+                                    Errorscanner = new Scanner(p2.getErrorStream());
+
+                                    while (Errorscanner.hasNext()) {
+                                        String line2 = Errorscanner.next();
+                                        System.err.println(line2);
+                                    }
+                                    break;
+                                default:
+                                    throw new Exception("Unknown SpotState String!");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return WriteResponse.success();
+                    }
+                }
+                return WriteResponse.badRequest("The String=\""+vParkingSpotState_temp+"\" was not a valid parameter." +
+                        "The following strings can be used as parameters: \""+vParkingSpotState_temp+"\"");
+
             case RES_LOT_NAME:
                 vLotName = (String) value.getValue();
                 fireResourcesChange(resourceId);
@@ -75,6 +129,7 @@ public class ParkingSpot extends BaseInstanceEnabler {
     }
 
     private synchronized void setParkingSpotId(String value) {
+
         if (vParkingSpotId != value) {
             vParkingSpotId = value;
             fireResourcesChange(RES_PARKING_SPOT_ID);
