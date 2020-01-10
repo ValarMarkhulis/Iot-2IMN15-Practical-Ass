@@ -36,3 +36,7 @@ bin/
 **/*.der
 **/*.pem
 !**/src/**/*.der
+
+# python binaries
+__pycache__
+*pyc
