@@ -17,11 +17,9 @@ public class ParkingLot {
 
     public static void main(String[] args) throws Exception {
         LOG.info("Launching server...");
-        // Register a service to DNS-SD
-
 
         // Create a JmDNS instance
-        final JmDNS jmdns = JmDNS.create(InetAddress.getLocalHost());
+        final JmDNS jmdns = JmDNS.create(InetAddress.getLocalHost().getCanonicalHostName());
 
         // Publish Leshan CoAP Service
         ServiceInfo coapServiceInfo = ServiceInfo.create("_parkingserver._udp.", "P1", 5683, "");
