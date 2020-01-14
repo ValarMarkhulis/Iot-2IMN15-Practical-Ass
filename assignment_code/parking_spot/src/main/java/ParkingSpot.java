@@ -44,18 +44,21 @@ public class ParkingSpot {
 
         }
 
-        //get serverURI
-        String serverURI = "coap://localhost:" + LwM2m.DEFAULT_COAP_PORT; //TODO: SHOULD GET FROM JmDNS
+
 
         // Create a JmDNS instance
         final JmDNS jmdns = JmDNS.create();
+        ServiceInfo p = null;
         for (int i = 1; i < 2; i++) {
-            ServiceInfo p = jmdns.getServiceInfo("_parkingserver._udp.", "P"+i,3000);
+            p = jmdns.getServiceInfo("_parkingserver._udp.", "P"+i,3000);
             if(p != null){
                 System.out.println(p.toString());
                 System.out.println("p"+1+" is ="+ Arrays.toString(p.getHostAddresses()));
             }
         }
+
+        //get serverURI
+        String serverURI = "coap://192.168.0.103:" + LwM2m.DEFAULT_COAP_PORT; //TODO: SHOULD GET FROM JmDNS
 
         // get local address
         String localAddress = "localhost";
@@ -107,10 +110,6 @@ public class ParkingSpot {
         builder.setCoapConfig(coapConfig);
         final LeshanClient client = builder.build();
 
-
-        client.start();
-        System.out.println("ended");
-
         // De-register on shutdown and stop client.
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -118,6 +117,11 @@ public class ParkingSpot {
                 client.destroy(true); // send de-registration request before destroy
             }
         });
+        client.start();
+
+        String registrationId = client.getRegistrationId();
+        System.out.printf("Registered as %s\n", registrationId);
+
 
     }
 }
