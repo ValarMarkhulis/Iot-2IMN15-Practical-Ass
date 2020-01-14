@@ -59,9 +59,9 @@ Contributors:
                             <mainClass>org.eclipse.leshan.client.demo.LeshanClientParkingSpot</mainClass>
                         </manifest>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>../jar-with-dependencies-with-logback.xml</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <descriptor>../../jar-with-dependencies-with-logback.xml</descriptor>
+                    </descriptors>
                 </configuration>
                 <executions>
                     <execution>
