@@ -30,9 +30,7 @@ import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -55,9 +53,15 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.leshan.LwM2m;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeEncoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
+import org.eclipse.leshan.core.observation.Observation;
+import org.eclipse.leshan.core.request.ObserveRequest;
+import org.eclipse.leshan.core.request.ReadRequest;
+import org.eclipse.leshan.core.response.LwM2mResponse;
+import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.demo.servlet.ClientServlet;
@@ -69,6 +73,9 @@ import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.VersionedModelProvider;
 import org.eclipse.leshan.server.redis.RedisRegistrationStore;
 import org.eclipse.leshan.server.redis.RedisSecurityStore;
+import org.eclipse.leshan.server.registration.Registration;
+import org.eclipse.leshan.server.registration.RegistrationListener;
+import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.eclipse.leshan.server.security.EditableSecurityStore;
 import org.eclipse.leshan.server.security.FileSecurityStore;
 import org.eclipse.leshan.util.SecurityUtil;
@@ -382,7 +389,7 @@ public class LeshanServerDemo {
         builder.setEncoder(new DefaultLwM2mNodeEncoder(new MagicLwM2mValueConverter()));
 
         // Create and start LWM2M server
-        LeshanServer lwServer = builder.build();
+        final LeshanServer lwServer = builder.build();
 
         // Now prepare Jetty
         InetSocketAddress jettyAddr;
@@ -391,7 +398,7 @@ public class LeshanServerDemo {
         } else {
             jettyAddr = new InetSocketAddress(webAddress, webPort);
         }
-        Server server = new Server(jettyAddr);
+        final Server server = new Server(jettyAddr);
         WebAppContext root = new WebAppContext();
         root.setContextPath("/");
         root.setResourceBase(LeshanServerDemo.class.getClassLoader().getResource("webapp").toExternalForm());
@@ -452,5 +459,58 @@ public class LeshanServerDemo {
             }
         });
         AvahiPublishThread.start();
+
+        lwServer.getRegistrationService().addListener(new RegistrationListener() {
+
+            public void registered(Registration registration, Registration previousReg,
+                                   Collection<Observation> previousObsersations) {
+                System.out.println("new device: " + registration.getEndpoint());
+                try {
+//                    ReadResponse response = server.send(registration, new ReadRequest(3,0,13));
+                    ReadResponse response = lwServer.send(registration, new ReadRequest(6,0,0));
+                    ReadResponse response2 = lwServer.send(registration, new ReadRequest(6,0,1));
+                    //ReadResponse response3 = server.send(registration, new ReadRequest(32700,0,32800));
+
+                    if (response.isSuccess()) {
+                        LwM2mSingleResource content = (LwM2mSingleResource) response.getContent();
+                        //System.out.println("Here!");
+                        //System.out.println("Device time:" + content.getValue().toString());
+                        System.out.println(content.getValue().toString());
+
+                    }else {
+                        System.out.println("Failed to read:" + response.getCode() + " " + response.getErrorMessage());
+                    }
+                    if (response2.isSuccess()) {
+                        LwM2mSingleResource content = (LwM2mSingleResource) response2.getContent();
+                        //System.out.println("Here!");
+                        //System.out.println("Device time:" + content.getValue().toString());
+                        System.out.println(content.getValue().toString());
+
+                    }else {
+                        System.out.println("Failed to read:" + response2.getCode() + " " + response2.getErrorMessage());
+                    }
+
+                    if(Arrays.asList(registration.getObjectLinks()).stream().anyMatch(l -> "/32700/0".equals(l.getUrl()))){
+                        try {
+                            LwM2mResponse response3 = lwServer.send(registration, new ObserveRequest(32700), 5_000L);
+                            System.out.println("Observe response: " + response3);
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            public void updated(RegistrationUpdate update, Registration updatedReg, Registration previousReg) {
+                System.out.println("device is still here: " + updatedReg.getEndpoint());
+            }
+
+            public void unregistered(Registration registration, Collection<Observation> observations, boolean expired,
+                                     Registration newReg) {
+                System.out.println("device left: " + registration.getEndpoint());
+            }
+        });
     }
 }

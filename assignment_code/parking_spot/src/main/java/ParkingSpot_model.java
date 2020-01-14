@@ -22,7 +22,7 @@ public class ParkingSpot_model extends BaseInstanceEnabler {
                     , RES_LOT_NAME
             );
     // Variables storing current values.
-    private String vParkingSpotId = "";
+    private String vParkingSpotId = "1";
     // Free,Reserved,Occupied
     private final String[] SpotStates = new String[]{"free","reserved","occupied"};
     private String vParkingSpotState = "free";

@@ -8,6 +8,7 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,6 +44,11 @@ public class ParkingLot extends BaseInstanceEnabler {
     public synchronized ReadResponse read(ServerIdentity identity, int resourceId) {
         switch (resourceId) {
             case RES_PARKING_LOT_ID:
+                try {
+                    Process p = Runtime.getRuntime().exec("espeak " + "Im_Alive!");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return ReadResponse.success(resourceId, vParkingLotId);
             case RES_LOT_NAME:
                 return ReadResponse.success(resourceId, vLotName);
