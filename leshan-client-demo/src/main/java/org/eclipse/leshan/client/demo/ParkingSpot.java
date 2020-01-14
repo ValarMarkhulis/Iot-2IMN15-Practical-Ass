@@ -60,11 +60,11 @@ public class ParkingSpot extends BaseInstanceEnabler {
                         fireResourcesChange(resourceId);
                         try {
                             Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + vParkingSpotState+"");
+                            String changeScreenScript = System.getProperty("user.dir") + "/../python_code/LEDmatrixStatusChange.py ";
                             switch (vParkingSpotState){
                                 case "free":
                                     System.out.println("I am here1!!");
-                                    Process p2 = Runtime.getRuntime().exec("" +
-                                            "python /home/"+System.getProperty("user.name")+"/PythonScriptsIoT/LEDmatrixStatusGREEN.py");
+                                    Process p2 = Runtime.getRuntime().exec(changeScreenScript + "G");
                                     Scanner Errorscanner = new Scanner(p2.getErrorStream());
 
                                     while (Errorscanner.hasNext()) {
@@ -74,8 +74,7 @@ public class ParkingSpot extends BaseInstanceEnabler {
                                     break;
                                 case "reserved":
                                     System.out.println("I am here2!!");
-                                    p2 = Runtime.getRuntime().exec("" +
-                                            "python /home/"+System.getProperty("user.name")+"/PythonScriptsIoT/LEDmatrixStatusORANGE.py");
+                                    p2 = Runtime.getRuntime().exec(changeScreenScript + "O");
                                     Errorscanner = new Scanner(p2.getErrorStream());
 
                                     while (Errorscanner.hasNext()) {
@@ -85,8 +84,7 @@ public class ParkingSpot extends BaseInstanceEnabler {
                                     break;
                                 case "occupied":
                                     System.out.println("I am here3!!");
-                                    p2 = Runtime.getRuntime().exec("" +
-                                            "python /home/"+System.getProperty("user.name")+"/PythonScriptsIoT/LEDmatrixStatusRED.py");
+                                    p2 = Runtime.getRuntime().exec(changeScreenScript + "R");
                                     Errorscanner = new Scanner(p2.getErrorStream());
 
                                     while (Errorscanner.hasNext()) {
