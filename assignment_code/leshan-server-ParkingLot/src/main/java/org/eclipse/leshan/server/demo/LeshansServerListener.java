@@ -54,7 +54,7 @@ public class LeshansServerListener {
                     //System.out.println("Testing:"+observation.toString());
                 }
                 else if(observation.getPath().toString().matches("/32700/0/32802")){
-                    //Look for "Parking Spot State" /32700/0/32802
+                    //Look for "Parking Spot Lot name" /32700/0/32802
                     LwM2mSingleResource test = (LwM2mSingleResource)response.getContent();
 
                     System.out.println("[Whats in /32700/0/32802] "+test.getValue().toString());

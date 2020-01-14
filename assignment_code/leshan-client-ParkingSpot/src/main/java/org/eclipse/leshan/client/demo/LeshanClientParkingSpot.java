@@ -49,6 +49,7 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 import static org.eclipse.leshan.LwM2mId.*;
 import static org.eclipse.leshan.client.object.Security.*;
@@ -338,26 +339,44 @@ public class LeshanClientParkingSpot {
         }
 
 
-
+        System.out.println("JmDNS running and trying to find a server..");
         // Create a JmDNS instance
         final JmDNS jmdns = JmDNS.create();
         ServiceInfo p = null;
-        for (int i = 1; i < 2; i++) {
-            p = jmdns.getServiceInfo("_parkingserver._udp.", "P"+i,3000);
-            if(p != null){
-                System.out.println(p.toString());
-                System.out.println("p"+1+" is ="+ Arrays.toString(p.getHostAddresses()));
+        ServiceInfo temp = null;
+        for (int i = 1; i <4; i++) {
+            temp = jmdns.getServiceInfo("_parkingserver._udp.", "P"+i,5000);
+            try {
+                System.out.println(temp.toString());
+                if(p == null){
+                    p = temp;
+                    System.out.println("p"+1+" is ="+ Arrays.toString(new String[]{p.getHostAddresses()[0]}));
+                    System.out.println(p.getServer());
+                }
+            }catch (Exception e){
+
             }
+
+
         }
 
+        String temp_URL = "localhost";
+        try {
+            temp_URL = Arrays.toString(new String[]{p.getHostAddresses()[0]});
+            System.out.println(temp_URL);
+            if(temp_URL.startsWith("[[f")){
+                temp_URL = p.getServer().replace("-",".").replace(".local.","");
+            }else if(temp_URL.startsWith("[")){
+                temp_URL = temp_URL.replace("[","").replace("]","");
+            }
+            System.out.println(temp_URL);
+        }catch (Exception e){
+            System.err.println("There was no valid server, using \"localhost\"");
+        }
+
+
         //get serverURI
-        serverURI = "coap://localhost:" + LwM2m.DEFAULT_COAP_PORT; //TODO: SHOULD GET FROM JmDNS
-
-        // get local address
-        localAddress = "localhost";
-        localPort = 7331;
-
-
+        serverURI = "coap://"+temp_URL+":" + LwM2m.DEFAULT_COAP_PORT; //TODO: SHOULD GET FROM JmDNS
 
         /*Our code ended*/
 

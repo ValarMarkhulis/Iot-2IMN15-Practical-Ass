@@ -20,10 +20,7 @@ package org.eclipse.leshan.server.demo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.BindException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.URI;
+import java.net.*;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -420,12 +417,46 @@ public class LeshanServerParkingLot {
                 new ObjectSpecServlet(lwServer.getModelProvider(), lwServer.getRegistrationService()));
         root.addServlet(objectSpecServletHolder, "/api/objectspecs/*");
 
+
+        //Display Network settings/interfaces
+        String ip = null;
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface iface = interfaces.nextElement();
+                // filters out 127.0.0.1 and inactive interfaces
+                if (iface.isLoopback() || !iface.isUp())
+                    continue;
+
+                Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                while(addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+                    ip = addr.getHostAddress();
+                    System.out.println(iface.getDisplayName() + " " + ip);
+                }
+            }
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("My ip="+ip);
+
+
+
+
         // Register a service to DNS-SD
         // Create a JmDNS instance
-        final JmDNS jmdns = JmDNS.create(InetAddress.getLocalHost().getCanonicalHostName());
+        final JmDNS jmdns;
+        if(System.getProperty("user.name").matches("pi")){
+            jmdns = JmDNS.create(ip);
+            System.out.println("I'm: \""+System.getProperty("user.name")+"\"");
+        }else{
+            jmdns = JmDNS.create(InetAddress.getLocalHost().getHostAddress());
+            System.out.println("I'm: \""+System.getProperty("user.name")+"\"");
+        }
+
 
         // Publish Leshan CoAP Service
-        ServiceInfo coapServiceInfo = ServiceInfo.create("_parkingserver._udp.", "P1", LwM2m.DEFAULT_COAP_PORT, "");
+        ServiceInfo coapServiceInfo = ServiceInfo.create("_parkingserver._udp.", "P3", LwM2m.DEFAULT_COAP_PORT, "");
         jmdns.registerService(coapServiceInfo);
 
 
@@ -446,4 +477,6 @@ public class LeshanServerParkingLot {
         });
 
     }
+
+
 }
