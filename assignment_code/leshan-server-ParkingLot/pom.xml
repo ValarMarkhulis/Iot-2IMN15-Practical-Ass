@@ -99,7 +99,7 @@ Contributors:
                         </manifest>
                     </archive>
                     <descriptors>
-                        <descriptor>../jar-with-dependencies-with-logback.xml</descriptor>
+                        <descriptor>../../jar-with-dependencies-with-logback.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
