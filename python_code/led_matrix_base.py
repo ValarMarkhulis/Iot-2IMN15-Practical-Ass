@@ -34,15 +34,15 @@ def get_pixel_params():
     if len(sys.argv) < 4:
         print("Parameters: \n\tX(mandatory)\n\tY(mandatory)=[1,0]\n\tcolor(mandatory)=[G.O,R]")
         sys.exit()
-    X = sys.argv[1]
-    Y = sys.argv[2]
+    X = int(sys.argv[1])
+    Y = int(sys.argv[2])
     color = sys.argv[3]
 
     if color not in "ROG":
         print("Invalid color provided")
         sys.exit(1)
 
-    if (int(X) > 7 or int(Y) > 7):
+    if (X > 7 or Y > 7):
         print("Bad coordinates provided: x={}, y={}".format(X, Y))
         sys.exit(1)
 
