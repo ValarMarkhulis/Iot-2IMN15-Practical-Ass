@@ -30,6 +30,32 @@ def get_direction():
     return color, direction
 
 
+def get_pixel_params():
+    if len(sys.argv) < 4:
+        print("Parameters: \n\tX(mandatory)\n\tY(mandatory)=[1,0]\n\tcolor(mandatory)=[G.O,R]")
+        sys.exit()
+    X = sys.argv[1]
+    Y = sys.argv[2]
+    color = sys.argv[2]
+
+    if color not in "ROG":
+        print("Invalid color provided")
+        sys.exit(1)
+
+    if (X > 7 or Y > 7):
+        print("Bad coordinates provided: x={}, y={}".format(X, Y))
+        sys.exit(1)
+
+    if color == "R":
+        color = R
+    elif color == "G":
+        color = G
+    elif color == "O":
+        color = O
+
+    return X, Y, color
+
+
 def flush_color(color, direction=""):
     logo = [color] * 48 + arrow(direction)
     return logo
