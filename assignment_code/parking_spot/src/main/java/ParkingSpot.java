@@ -20,6 +20,7 @@ public class ParkingSpot {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParkingSpot.class);
     private static ArrayList parkingServerNames = new ArrayList<String>();
+    private static ArrayList parkingServerAddresses = new ArrayList<String>();
 
     // static String endpoint = "..." ; // choose an endpoint name
 
@@ -30,7 +31,6 @@ public class ParkingSpot {
         @Override
         public void serviceAdded(ServiceEvent event) {
             System.out.println("Service added: " + event.getInfo());
-            parkingServerNames.add(event.getName());
         }
 
         @Override
@@ -41,6 +41,13 @@ public class ParkingSpot {
         @Override
         public void serviceResolved(ServiceEvent event) {
             System.out.println("Service resolved: " + event.getInfo());
+            parkingServerNames.add(event.getName());
+            InetAddress [] inetAddresses = event.getInfo().getInetAddresses();
+            for (InetAddress a : inetAddresses) {
+               System.out.print("ADDR: ");
+               System.out.println(a);
+            }
+            parkingServerAddresses.add(inetAddresses[0]);
         }
     }
 
@@ -55,9 +62,14 @@ public class ParkingSpot {
             // Wait a bit
             Thread.sleep(3000);
 
-            for (int i = 0; i < parkingServerNames.size(); i++) {
-               System.out.println(parkingServerNames.get(i));
+            while (true) {
+                for (int i = 0; i < parkingServerNames.size(); i++) {
+                   System.out.println(parkingServerNames.get(i));
+                   System.out.println(parkingServerAddresses.get(i));
+                }
+                Thread.sleep(1000);
             }
+
         } catch (UnknownHostException e) {
             System.out.println(e.getMessage());
         } catch (IOException e) {
