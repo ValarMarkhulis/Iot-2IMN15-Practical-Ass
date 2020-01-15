@@ -376,7 +376,9 @@ public class LeshanClientParkingSpot {
 
 
         //get serverURI
-        serverURI = "coap://"+temp_URL+":" + LwM2m.DEFAULT_COAP_PORT; //TODO: SHOULD GET FROM JmDNS
+        if(serverURI != null){
+            serverURI = "coap://"+temp_URL+":" + LwM2m.DEFAULT_COAP_PORT;
+        }
 
         /*Our code ended*/
 
@@ -427,10 +429,11 @@ public class LeshanClientParkingSpot {
 
         //Added
         //initializer.setInstancesForObject(OBJECT_ID_LOCATION, new Location());
+        ParkingSpot parkingSpot = new ParkingSpot();
         initializer.setInstancesForObject(OBJECT_ID_MAGNETOMETER, new Magnetometer());
         initializer.setInstancesForObject(OBJECT_ID_ADDRESSABLE_TEXT_DISPLAY, new AddressableTextDisplay());
-        initializer.setInstancesForObject(OBJECT_ID_MULTIPLE_AXIS_JOYSTICK, new MultipleAxisJoystick());
-        initializer.setInstancesForObject(OBJECT_ID_PARKING_SPOT, new ParkingSpot());
+        initializer.setInstancesForObject(OBJECT_ID_MULTIPLE_AXIS_JOYSTICK, new MultipleAxisJoystick(parkingSpot));
+        initializer.setInstancesForObject(OBJECT_ID_PARKING_SPOT, parkingSpot);
         initializer.setInstancesForObject(OBJECT_ID_VEHICLE_COUNTER, new VehicleCounter());
         initializer.setInstancesForObject(OBJECT_ID_PARKING_LOT, new ParkingLot());
 

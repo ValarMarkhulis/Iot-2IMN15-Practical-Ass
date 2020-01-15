@@ -60,7 +60,7 @@ public class ParkingSpot extends BaseInstanceEnabler {
                         fireResourcesChange(resourceId);
                         try {
                             Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + vParkingSpotState+"");
-                            String changeScreenScript = System.getProperty("user.dir") + "/../../python_code/LEDmatrixStatusChange.py ";
+                            String changeScreenScript = System.getProperty("user.dir") + "/../LEDmatrixStatusChange.py ";
                             System.out.println("Trying to run LEDMatrixStatusChange from "+changeScreenScript);
                             switch (vParkingSpotState){
                                 case "free":

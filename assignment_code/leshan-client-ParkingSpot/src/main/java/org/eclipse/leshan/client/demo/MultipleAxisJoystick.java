@@ -3,13 +3,19 @@ package org.eclipse.leshan.client.demo;
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.model.ResourceModel;
+import org.eclipse.leshan.core.node.LwM2mNodeVisitor;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 public class MultipleAxisJoystick extends BaseInstanceEnabler {
     // Static values for resource items
@@ -28,6 +34,7 @@ public class MultipleAxisJoystick extends BaseInstanceEnabler {
                     , RES_Z_VALUE
                     , RES_APPLICATION_TYPE
             );
+
     // Variables storing current values.
     private boolean vDigitalInputState = false;
     private int vDigitalInputCounter = 0;
@@ -36,7 +43,120 @@ public class MultipleAxisJoystick extends BaseInstanceEnabler {
     private double vZValue = 0.0d;
     private String vApplicationType = "";
 
+    //Holding the parkingSpot
+    private ParkingSpot parkingSpot;
+
     public MultipleAxisJoystick() {
+    }
+
+    public MultipleAxisJoystick(final ParkingSpot parkingSpot) {
+        super();
+        this.parkingSpot = parkingSpot;
+        Thread joystickReader;
+        System.out.println("Starting the joystick!!!!!!!!!!");
+        joystickReader = new Thread(new Runnable() {
+            public void run() {          Process p = null;
+                try {
+                    String joyStickString = System.getProperty("user.dir")+"/../JoystickControl.py";
+                    System.out.println("Trying to run LEDMatrixStatusChange from "+joyStickString);
+                    p = Runtime.getRuntime().exec("python "+joyStickString);
+                    //p = Runtime.getRuntime().exec("python /home/chris/IdeaProjects/LegeLand/testText2Spe.py");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Scanner Errorscanner = new Scanner(p.getErrorStream());
+                Scanner scanner = new Scanner(p.getInputStream());
+                while (scanner.hasNext()) {
+                    //String line2 = Errorscanner.next();
+                    //System.err.println(line2);
+
+                    String line = scanner.next();
+                    System.out.println(line);
+                    // process the content of line.
+                    if(line.matches("Free")){
+
+                        LwM2mResource free = new LwM2mResource() {
+                            @Override
+                            public ResourceModel.Type getType() {
+                                return null;
+                            }
+
+                            @Override
+                            public boolean isMultiInstances() {
+                                return false;
+                            }
+
+                            @Override
+                            public Object getValue() {
+                                return "Free";
+                            }
+
+                            @Override
+                            public Map<Integer, ?> getValues() {
+                                return null;
+                            }
+
+                            @Override
+                            public Object getValue(int id) {
+                                return null;
+                            }
+
+                            @Override
+                            public int getId() {
+                                return 0;
+                            }
+
+                            @Override
+                            public void accept(LwM2mNodeVisitor visitor) {
+
+                            }
+                        };
+                        parkingSpot.write( null, 32801,free);
+                    }else if(line.matches("Occupied")){
+                        LwM2mResource occuiped = new LwM2mResource() {
+                            @Override
+                            public ResourceModel.Type getType() {
+                                return null;
+                            }
+
+                            @Override
+                            public boolean isMultiInstances() {
+                                return false;
+                            }
+
+                            @Override
+                            public Object getValue() {
+                                return "occupied";
+                            }
+
+                            @Override
+                            public Map<Integer, ?> getValues() {
+                                return null;
+                            }
+
+                            @Override
+                            public Object getValue(int id) {
+                                return null;
+                            }
+
+                            @Override
+                            public int getId() {
+                                return 0;
+                            }
+
+                            @Override
+                            public void accept(LwM2mNodeVisitor visitor) {
+
+                            }
+                        };
+                        parkingSpot.write( null, 32801,occuiped);
+                    }
+                } }
+        });
+        joystickReader.start();
+
+        //TODO: Should also set the variables like "vDigitalInputState"
     }
 
     @Override
