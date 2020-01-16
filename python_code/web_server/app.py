@@ -19,10 +19,16 @@ def home():
 
 @socketio.on('get_cars')
 def handle_message(message):
-    r = query_db("SELECT COUNT(*) FROM PARKING_SPOTS WHERE spot_state='occupied'")[0][0]
-    send(r)
+    occupied_count = query_db("SELECT COUNT(*) FROM PARKING_SPOTS WHERE spot_state='occupied'")[0][0]
+    free_count = query_db("SELECT COUNT(*) FROM PARKING_SPOTS WHERE spot_state='free'")[0][0]
+    reserved_count = query_db("SELECT COUNT(*) FROM PARKING_SPOTS WHERE spot_state='reserved'")[0][0]
+    send({
+        "occupied": occupied_count,
+        "free": free_count,
+        "reserved": reserved_count
+    }, json=True)
 
 
 if __name__ == '__main__':
-    get_db().execute("CREATE TABLE IF NOT EXISTS PARKING_SPOTS(id varchar(32) PRIMARY KEY, spot_state varchar(8), lot_name varchar(128))")
+    get_db().execute("CREATE TABLE IF NOT EXISTS PARKING_SPOTS(id varchar(128) PRIMARY KEY, spot_state varchar(8), lot_name varchar(128))")
     socketio.run(app)

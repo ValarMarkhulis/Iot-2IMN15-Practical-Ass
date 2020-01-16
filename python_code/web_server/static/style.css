@@ -4,9 +4,25 @@ body, html {
   justify-content: space-around;
 }
 
-#car-count {
+#info {
   font-family: Arial;
-  color: #333;
   align-self: center;
-  font-size: 10em;
+  font-size: 2em;
+}
+
+table {
+  text-align: center;
+  border-spacing: 10px;
+}
+
+.free {
+  color: green;
+}
+
+.reserved {
+  color: orange;
+}
+
+.occupied {
+  color: red;
 }

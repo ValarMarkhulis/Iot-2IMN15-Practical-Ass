@@ -8,7 +8,20 @@
     <link rel="stylesheet" href="static/style.css">
   </head>
   <body>
-    <h1 id="car-count">0</h1>
+    <div id="info">
+      <table>
+        <tr>
+          <th class="free">Free</th>
+          <th class="reserved">Reserved</th>
+          <th class="occupied">Occupied</th>
+        </tr>
+        <tr>
+          <td id="free-count" class="free"></td>
+          <td id="reserved-count" class="reserved"></td>
+          <td id="occupied-count" class="occupied"></td>
+        </tr>
+      </table>
+    </div>
     <script type="text/javascript" charset="utf-8">
       var socket = io();
       var indicator = document.getElementById("car-count");
@@ -17,8 +30,15 @@
         socket.emit('get_cars', {data: 'I\'m connected!'});
       });
 
-      socket.on('message', function(msg){
-        indicator.innerHTML = msg;
+      socket.on('json', function(msg){
+        var free = document.getElementById("free-count");
+        var reserved = document.getElementById("reserved-count");
+        var occupied = document.getElementById("occupied-count");
+        console.log(msg);
+
+        free.innerHTML = msg.free;
+        reserved.innerHTML = msg.reserved;
+        occupied.innerHTML = msg.occupied;
       });
 
       function getUpdate() {
