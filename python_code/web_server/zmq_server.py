@@ -29,7 +29,7 @@ if __name__ == "__main__":
                     ON CONFLICT(id) DO UPDATE SET
                     spot_state=excluded.spot_state,
                     lot_name=excluded.lot_name
-                    WHERE excluded.id={0};
+                    WHERE excluded.id='{0}';
                 """.format(spot_id, state, name)
                 exec_q(query)
             socket.send(b"ACK")

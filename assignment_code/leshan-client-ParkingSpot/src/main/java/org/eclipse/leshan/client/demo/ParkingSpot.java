@@ -25,11 +25,11 @@ public class ParkingSpot extends BaseInstanceEnabler {
                     , RES_LOT_NAME
             );
     // Variables storing current values.
-    private String vParkingSpotId = "Default_vParkingSpotId_set_by_Client";
+    private String vParkingSpotId = "Default_vParkingSpotId";
     // Free,Reserved,Occupied
     private final String[] SpotStates = new String[]{"free","reserved","occupied"};
     private String vParkingSpotState = "free";
-    private String vLotName = "Default_vLotName_set_by_Client";
+    private String vLotName = "Default_vLotName";
 
     public ParkingSpot() {
     }
@@ -60,7 +60,7 @@ public class ParkingSpot extends BaseInstanceEnabler {
                         fireResourcesChange(resourceId);
                         try {
                             Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + vParkingSpotState+"");
-                            String changeScreenScript = System.getProperty("user.dir") + "/../LEDmatrixStatusChange.py ";
+                            String changeScreenScript = System.getProperty("user.dir") + "/python_code/LEDmatrixStatusChange.py ";
                             System.out.println("Trying to run LEDMatrixStatusChange from "+changeScreenScript);
                             switch (vParkingSpotState){
                                 case "free":

@@ -79,7 +79,7 @@ public class LeshansServerListener {
                     parkingLot.makeSpotStateChange(test.getValue().toString());
 
                     //Do the ZMQ message to update a parking spot at the ZMQ server
-                    zmq_boy.SendMessage("REG " + pS.getvParkingSpotId() + " " + pS.getvParkingSpotState() +
+                    zmq_boy.SendMessage("REG " + pS.getvParkingSpotId() + " " + test.getValue().toString() +
                             " " + pS.getvLotName());
 
 

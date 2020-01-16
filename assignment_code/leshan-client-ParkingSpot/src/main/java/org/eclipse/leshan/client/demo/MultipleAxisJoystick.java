@@ -57,7 +57,7 @@ public class MultipleAxisJoystick extends BaseInstanceEnabler {
             public void run() {
                 Process p = null;
                 try {
-                    String joyStickString = System.getProperty("user.dir")+"/../JoystickControl.py";
+                    String joyStickString = System.getProperty("user.dir")+"/python_code/JoystickControl.py";
                     System.out.println("Trying to run LEDMatrixStatusChange from "+joyStickString);
                     p = Runtime.getRuntime().exec("python "+joyStickString);
                     //p = Runtime.getRuntime().exec("python /home/chris/IdeaProjects/LegeLand/testText2Spe.py");

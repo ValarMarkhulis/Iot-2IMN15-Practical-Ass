@@ -37,7 +37,7 @@ public class ParkingLot extends BaseInstanceEnabler {
         return vLotName;
     }
 
-    private String vLotName = "TestLotName - IoT-pi42";
+    private String vLotName = "TestLotName_-_IoT-pi42";
     private int vCapacity = 1337;
     private int vReservations = 2;
     private int vVehicles = 1;
@@ -45,7 +45,7 @@ public class ParkingLot extends BaseInstanceEnabler {
 
     //Holds one parkingSpot
     private ParkingSpot parkingSpot;
-    String changeScreenScript = System.getProperty("user.dir") + "/set_parking_spot_status.py ";
+    String changeScreenScript = System.getProperty("user.dir") + "/../python_code/set_parking_spot_status.py ";
 
     public ParkingLot(ParkingSpot pS) {
         if(parkingSpot == null){

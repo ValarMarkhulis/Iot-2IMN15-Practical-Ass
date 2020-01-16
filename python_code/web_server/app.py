@@ -31,4 +31,4 @@ def handle_message(message):
 
 if __name__ == '__main__':
     get_db().execute("CREATE TABLE IF NOT EXISTS PARKING_SPOTS(id varchar(128) PRIMARY KEY, spot_state varchar(8), lot_name varchar(128))")
-    socketio.run(app)
+    socketio.run(app, host="0.0.0.0")
