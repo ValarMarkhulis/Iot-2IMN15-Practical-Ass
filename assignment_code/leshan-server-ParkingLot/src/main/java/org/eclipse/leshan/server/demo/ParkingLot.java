@@ -1,4 +1,4 @@
-package org.eclipse.leshan.client.demo;
+package org.eclipse.leshan.server.demo;
 
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
@@ -8,8 +8,10 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class ParkingLot extends BaseInstanceEnabler {
     // Static values for resource items
@@ -29,14 +31,75 @@ public class ParkingLot extends BaseInstanceEnabler {
                     , RES_FREE
             );
     // Variables storing current values.
-    private String vParkingLotId = "TestId set by Client";
-    private String vLotName = "Default vLotName set by Client";
+    private String vParkingLotId = "TestId";
+
+    public String getvLotName() {
+        return vLotName;
+    }
+
+    private String vLotName = "TestLotName - IoT-pi42";
     private int vCapacity = 1337;
     private int vReservations = 2;
     private int vVehicles = 1;
     private int vFree = 4;
 
-    public ParkingLot() {
+    //Holds one parkingSpot
+    private ParkingSpot parkingSpot;
+    String changeScreenScript = System.getProperty("user.dir") + "/set_parking_spot_status.py ";
+
+    public ParkingLot(ParkingSpot pS) {
+        if(parkingSpot == null){
+            System.out.println("A parkingSpot was added: "+pS.toString());
+            parkingSpot = pS;
+            String spotStatus = parkingSpot.getvParkingSpotState();
+            updateLotStatus(spotStatus);
+        }
+
+    }
+
+    private void updateLotStatus(String spotStatus) {
+
+        try {
+            //Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + spotStatus+"");
+
+            //TODO: Get the x,y from the "Location" object
+            String x = "0";
+            String y = "0";
+
+            System.out.println("Trying to run set_parking_spot_status.py from \n"
+                    +changeScreenScript+" with parm x="+x+" y="+y+" spotStatus="+spotStatus);
+
+            switch (spotStatus){
+                case "free":
+                    setParkingSpotStatus(x, y, "G");
+                    break;
+                case "reserved":
+                    setParkingSpotStatus(x, y, "O");
+                    break;
+                case "occupied":
+                    setParkingSpotStatus(x, y, "R");
+                    break;
+                default:
+                    throw new Exception("Unknown SpotState String!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setParkingSpotStatus(String x, String y, String color)  {
+        try {
+            Process p2 = Runtime.getRuntime().exec(changeScreenScript + x +" " + y + " "+color);
+            Scanner Errorscanner = new Scanner(p2.getErrorStream());
+
+            while (Errorscanner.hasNext()) {
+                String line2 = Errorscanner.next();
+                System.err.println(line2);
+            }
+        }catch (IOException ex ){
+            ex.printStackTrace();
+        }
+
     }
 
     @Override
@@ -126,4 +189,7 @@ public class ParkingLot extends BaseInstanceEnabler {
         }
     }
 
+    public void makeSpotStateChange(String updateLotStatusString) {
+        updateLotStatus(updateLotStatusString);
+    }
 }

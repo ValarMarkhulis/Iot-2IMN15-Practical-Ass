@@ -60,8 +60,8 @@ public class LeshanClientParkingSpot {
 
     private final static String[] modelPaths = new String[]{"3303.xml",
             //Our added tags
-            "6.xml", "3314.xml", "3341.xml", "3345.xml", "32700.xml", "32701.xml", "32702.xml"};
-
+             "32700.xml", "32701.xml", "32702.xml", "3345.xml"};
+    //Not used "6.xml", "3314.xml", "3341.xml",
 
     //Our constants corresponding to the xml files
     private static final int OBJECT_ID_LOCATION = 6;
@@ -339,6 +339,7 @@ public class LeshanClientParkingSpot {
         }
 
 
+        /*
         System.out.println("JmDNS running and trying to find a server..");
         // Create a JmDNS instance
         final JmDNS jmdns = JmDNS.create();
@@ -360,13 +361,16 @@ public class LeshanClientParkingSpot {
 
         }
 
+
+
         String temp_URL = "localhost";
         try {
             temp_URL = Arrays.toString(new String[]{p.getHostAddresses()[0]});
             System.out.println(temp_URL);
-            if(temp_URL.startsWith("[[f")){
+            //Do some checks
+            if(temp_URL.startsWith("[[f")){ //a IPv6 address
                 temp_URL = p.getServer().replace("-",".").replace(".local.","");
-            }else if(temp_URL.startsWith("[")){
+            }else if(temp_URL.startsWith("[")){ //a IPv4 addreess
                 temp_URL = temp_URL.replace("[","").replace("]","");
             }
             System.out.println(temp_URL);
@@ -375,10 +379,15 @@ public class LeshanClientParkingSpot {
         }
 
 
+
+
         //get serverURI
         if(serverURI != null){
             serverURI = "coap://"+temp_URL+":" + LwM2m.DEFAULT_COAP_PORT;
         }
+        */
+
+        serverURI = "coap://"+"raspberrypiMark.local"+":" + LwM2m.DEFAULT_COAP_PORT;
 
         /*Our code ended*/
 
@@ -417,10 +426,10 @@ public class LeshanClientParkingSpot {
             } else if (clientCertificate != null) {
                 initializer.setInstancesForObject(SECURITY, x509(serverURI, 123, clientCertificate.getEncoded(),
                         clientPrivateKey.getEncoded(), serverCertificate.getEncoded()));
-                initializer.setInstancesForObject(SERVER, new Server(123, 30, BindingMode.U, false));
+                initializer.setInstancesForObject(SERVER, new Server(123, 60, BindingMode.U, false));
             } else {
                 initializer.setInstancesForObject(SECURITY, noSec(serverURI, 123));
-                initializer.setInstancesForObject(SERVER, new Server(123, 30, BindingMode.U, false));
+                initializer.setInstancesForObject(SERVER, new Server(123, 10, BindingMode.U, false));
             }
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
@@ -429,12 +438,13 @@ public class LeshanClientParkingSpot {
 
         //Added
         //initializer.setInstancesForObject(OBJECT_ID_LOCATION, new Location());
+        //initializer.setInstancesForObject(OBJECT_ID_MAGNETOMETER, new Magnetometer());
+        //initializer.setInstancesForObject(OBJECT_ID_ADDRESSABLE_TEXT_DISPLAY, new AddressableTextDisplay());
+        //initializer.setInstancesForObject(OBJECT_ID_VEHICLE_COUNTER, new VehicleCounter());
+
         ParkingSpot parkingSpot = new ParkingSpot();
-        initializer.setInstancesForObject(OBJECT_ID_MAGNETOMETER, new Magnetometer());
-        initializer.setInstancesForObject(OBJECT_ID_ADDRESSABLE_TEXT_DISPLAY, new AddressableTextDisplay());
         initializer.setInstancesForObject(OBJECT_ID_MULTIPLE_AXIS_JOYSTICK, new MultipleAxisJoystick(parkingSpot));
         initializer.setInstancesForObject(OBJECT_ID_PARKING_SPOT, parkingSpot);
-        initializer.setInstancesForObject(OBJECT_ID_VEHICLE_COUNTER, new VehicleCounter());
         initializer.setInstancesForObject(OBJECT_ID_PARKING_LOT, new ParkingLot());
 
 

@@ -1,4 +1,4 @@
-package org.eclipse.leshan.client.demo;
+package org.eclipse.leshan.server.demo;
 
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
@@ -8,7 +8,6 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -25,13 +24,39 @@ public class ParkingSpot extends BaseInstanceEnabler {
                     , RES_LOT_NAME
             );
     // Variables storing current values.
-    private String vParkingSpotId = "Default vParkingSpotId set by Client";
+    private String vParkingSpotId = "";
     // Free,Reserved,Occupied
     private final String[] SpotStates = new String[]{"free","reserved","occupied"};
-    private String vParkingSpotState = "free";
-    private String vLotName = "Default vLotName set by Client";
 
-    public ParkingSpot() {
+    @Override
+    public String toString() {
+        return "ParkingSpot{" +
+                "vParkingSpotId='" + vParkingSpotId + '\'' +
+                ", The Spot can have the following States=" + Arrays.toString(SpotStates) +
+                ", vParkingSpotState='" + vParkingSpotState + '\'' +
+                ", vLotName='" + vLotName + '\'' +
+                '}';
+    }
+
+    public String getvParkingSpotId() {
+        return vParkingSpotId;
+    }
+
+    public String getvParkingSpotState() {
+        return vParkingSpotState;
+    }
+
+    public String getvLotName() {
+        return vLotName;
+    }
+
+    private String vParkingSpotState = "free";
+    private String vLotName = "";
+
+    public ParkingSpot(String vParkingSpotId, String vParkingSpotState,String vLotName ) {
+        this.vParkingSpotId = vParkingSpotId;
+        this.vLotName = vLotName;
+        this.vParkingSpotState = vParkingSpotState;
     }
 
     @Override
@@ -59,7 +84,7 @@ public class ParkingSpot extends BaseInstanceEnabler {
                         vParkingSpotState = vParkingSpotState_temp;
                         fireResourcesChange(resourceId);
                         try {
-                            Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + vParkingSpotState+"");
+                            //Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + vParkingSpotState+"");
                             String changeScreenScript = System.getProperty("user.dir") + "/../LEDmatrixStatusChange.py ";
                             System.out.println("Trying to run LEDMatrixStatusChange from "+changeScreenScript);
                             switch (vParkingSpotState){

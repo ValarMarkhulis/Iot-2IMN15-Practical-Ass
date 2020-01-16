@@ -1,12 +1,17 @@
 package org.eclipse.leshan.server.demo;
 
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.node.*;
 import org.eclipse.leshan.core.observation.Observation;
+import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.ObserveRequest;
 import org.eclipse.leshan.core.request.ReadRequest;
+import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.observation.ObservationListener;
 import org.eclipse.leshan.server.registration.Registration;
@@ -20,22 +25,28 @@ import java.util.Map;
 public class LeshansServerListener {
 
 
+    private ParkingLot parkingLot;
     LeshanServer lwServer;
     private final String[] whichListener2ImplementArray = new String[]{"registered", "updated", "unregistered"};
-
+    ParkingSpot pS;
 
     /**
      * @param lwServer
+     *
      */
     public LeshansServerListener(LeshanServer lwServer) {
         this.lwServer = lwServer;
         //Setup 3 registration Listeners which makes 3 observation listeners for the 3 resources:
+        //Look for "Parking Spot State" /32700/0
+        makeListener(32700, 0, -1, "registered");
         //Look for "Parking Spot State" /32700/0/32801
         makeListener(32700, 0, 32801, "registered");
         //Look for "Parking Spot Lot name" /32700/0/32802
         makeListener(32700, 0, 32802, "registered");
         //Look for "Parking Spot Instance 0" /32700/0
         makeListener(32702, 0, -1, "registered");
+        //TODO: Make reservation for a "Location" object to obtain a "x" and "y" value from the "RES_LATITUDE"
+        // and "RES_LONGITUDE"
 
         lwServer.getObservationService().addListener(new ObservationListener() {
             @Override
@@ -55,6 +66,8 @@ public class LeshansServerListener {
                     LwM2mSingleResource test = (LwM2mSingleResource) response.getContent();
 
                     System.out.print("[Whats in \"/32700/0/32801\"] \"" + test.getValue().toString() + "\" - ");
+                    // write the new state to the parking lot so it can update the display
+                    parkingLot.makeSpotStateChange(test.getValue().toString());
 
 
                     //System.out.println("Testing:"+observation.toString());
@@ -69,7 +82,8 @@ public class LeshansServerListener {
                 } else if (observation.getPath().toString().matches("/32700/0")) {
                     //Look for "Parking Spot Instance 0" /32700/0
                     Map<Integer, LwM2mResource> test = ((LwM2mObjectInstance) response.getContent()).getResources();
-                    System.out.println("Resources in /32700/0\n--------------");
+
+                    System.out.println("\nResources in /32700/0\n--------------");
                     test.forEach((k, v) -> System.out.println("Key=\"" + k + "\"\t\t Value=\"" + v.getValue().toString() + "\""));
                     System.out.println("-----------------");
 
@@ -77,7 +91,7 @@ public class LeshansServerListener {
                     //Look for "Parking Lot Instance 0" /32702/0/
                     Map<Integer, LwM2mResource> test = ((LwM2mObjectInstance) response.getContent()).getResources();
                     if (test.size() > 0) {
-                        System.out.println("Resources in /32702/0\n--------------");
+                        System.out.println("\nResources in /32702/0\n--------------");
                         test.forEach((k, v) -> System.out.println("Key=\"" + k + "\"\t\t Value=\"" + v.getValue().toString()+"\""));
                         System.out.println("-----------------");
                     }
@@ -102,6 +116,59 @@ public class LeshansServerListener {
             /*This is called when the devices tries to register at the server*/
             public void registered(Registration registration, Registration previousReg,
                                    Collection<Observation> previousObsersations) {
+
+                //If the registration is about /32700/0/ "Parking Spot Instance 0"
+                if(resourceID == -1 && objectInstanceId == 0 && objectId == 32700){
+                    System.out.println("A parking spot instance is trying to register itself!");
+                    ReadResponse response = null;
+                    try {
+                        //Do a read request on "Parking Spot Instance 0"
+                        response = lwServer.send(registration, new ReadRequest(32700), 5_000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    //System.out.println("DEBUG: \"/32700/\" res:" + ((LwM2mObject) response.getContent()).getInstance(0).getResources());
+
+                    //Put the ReadResponse into a Map, so we can get the value-key pair.
+                    Map<Integer, LwM2mResource> test = ((LwM2mObject) response.getContent()).getInstance(0).getResources();
+                    if (test.size() > 0) {
+                        System.out.println("\nResources in /32702/0\n--------------");
+                        test.forEach((k, v) -> System.out.println("Key=\"" + k + "\"\t\t Value=\"" + v.getValue().toString()+"\""));
+                        System.out.println("-----------------");
+
+                        //Make a new parkingSpot and add it to a new ParkingLot
+                        if(pS == null){ //TODO: There should be able to be more parkingSpots.
+                            pS = new ParkingSpot(test.get(32800).getValue().toString()
+                                    ,test.get(32801).getValue().toString(),test.get(32802).getValue().toString());
+                            parkingLot = new ParkingLot(pS);
+
+                            try {
+                                //Do a WriteRequest to "Parking Spot Lot name" /32700/0/32802 with the parkingLot "vLotName" name
+                                WriteRequest writeRequest = new WriteRequest(ContentFormat.TLV, 32700
+                                        , 0, 32802, parkingLot.getvLotName());
+
+                                //send the writeRequest
+                                final WriteResponse writeResponse = lwServer.send(registration, writeRequest, 5000);
+
+                                //Try to handle the writeResponse
+                                if(!writeResponse.isSuccess() || !writeResponse.isValid() ){
+                                    System.out.println("The writeResponse to \"Parking Spot Lot name\" with name=" + parkingLot.getvLotName() + " failed");
+
+                                    if(!writeResponse.isSuccess()){
+                                        System.out.println("DEBUG: isSuccess() returned false");
+                                    }else if(!writeResponse.isValid()){
+                                        System.out.println("DEBUG: isValid() returned false");
+                                    }
+                                }
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                    //System.out.println("The parking spot is in this state right now!: " + response);
+                }//TODO: Look for the registraion of a Location object path="/6" and pass it to the parkingspot
 
                 if (whichListener2Implement.equals("registered")) {
 

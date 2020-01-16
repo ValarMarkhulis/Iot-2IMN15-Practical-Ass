@@ -50,15 +50,9 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.leshan.LwM2m;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeEncoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
-import org.eclipse.leshan.core.observation.Observation;
-import org.eclipse.leshan.core.request.ObserveRequest;
-import org.eclipse.leshan.core.request.ReadRequest;
-import org.eclipse.leshan.core.response.LwM2mResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.demo.servlet.ClientServlet;
@@ -70,9 +64,6 @@ import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.VersionedModelProvider;
 import org.eclipse.leshan.server.redis.RedisRegistrationStore;
 import org.eclipse.leshan.server.redis.RedisSecurityStore;
-import org.eclipse.leshan.server.registration.Registration;
-import org.eclipse.leshan.server.registration.RegistrationListener;
-import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.eclipse.leshan.server.security.EditableSecurityStore;
 import org.eclipse.leshan.server.security.FileSecurityStore;
 import org.eclipse.leshan.util.SecurityUtil;
@@ -99,6 +90,8 @@ public class LeshanServerParkingLot {
 
     private static final Logger LOG = LoggerFactory.getLogger(LeshanServerParkingLot.class);
 
+
+
     private final static String[] modelPaths = new String[] { "31024.xml",
 
                             "10241.xml", "10242.xml", "10243.xml", "10244.xml", "10245.xml", "10246.xml", "10247.xml",
@@ -109,11 +102,11 @@ public class LeshanServerParkingLot {
 
                             "3200.xml", "3201.xml", "3202.xml", "3203.xml", "3300.xml", "3301.xml", "3302.xml",
                             "3303.xml", "3304.xml", "3305.xml", "3306.xml", "3308.xml", "3310.xml", "3311.xml",
-                            "3312.xml", "3313.xml", "3314.xml", "3315.xml", "3316.xml", "3317.xml", "3318.xml",
+                            "3312.xml", "3313.xml", "3315.xml", "3316.xml", "3317.xml", "3318.xml",
                             "3319.xml", "3320.xml", "3321.xml", "3322.xml", "3323.xml", "3324.xml", "3325.xml",
                             "3326.xml", "3327.xml", "3328.xml", "3329.xml", "3330.xml", "3331.xml", "3332.xml",
                             "3333.xml", "3334.xml", "3335.xml", "3336.xml", "3337.xml", "3338.xml", "3339.xml",
-                            "3340.xml", "3341.xml", "3342.xml", "3343.xml", "3344.xml", "3345.xml", "3346.xml",
+                            "3340.xml", "3342.xml", "3343.xml", "3344.xml", "3345.xml", "3346.xml",
                             "3347.xml", "3348.xml", "3349.xml", "3350.xml",
 
                             "Communication_Characteristics-V1_0.xml",
@@ -125,7 +118,9 @@ public class LeshanServerParkingLot {
 
                             "Non-Access_Stratum_NAS_configuration-V1_0.xml",
 				//My added files
-				"32700.xml","32701.xml","32702.xml","3314.xml","3341.xml","3345.xml","6.xml" };
+				"32700.xml","32701.xml","32702.xml","3345.xml", "6.xml"};
+
+                //Not used "3314.xml", "3341.xml",
 
     private final static String USAGE = "java -jar leshan-server-demo.jar [OPTION]\n\n";
 
