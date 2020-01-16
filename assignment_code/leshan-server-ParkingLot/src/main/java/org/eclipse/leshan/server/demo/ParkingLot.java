@@ -45,7 +45,7 @@ public class ParkingLot extends BaseInstanceEnabler {
 
     //Holds one parkingSpot
     private ParkingSpot parkingSpot;
-    String changeScreenScript = System.getProperty("user.dir") + "/../python_code/set_parking_spot_status.py ";
+    String changeScreenScript = System.getProperty("user.dir") + "/python_code/set_parking_spot_status.py ";
 
     public ParkingLot(ParkingSpot pS) {
         if(parkingSpot == null){
