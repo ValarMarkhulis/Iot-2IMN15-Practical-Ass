@@ -1,0 +1,12 @@
+body, html {
+  height: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+
+#car-count {
+  font-family: Arial;
+  color: #333;
+  align-self: center;
+  font-size: 10em;
+}
