@@ -83,6 +83,10 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.util.Pool;
 
+import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
+
+
 public class LeshanServerParkingLot {
 
     static {
@@ -438,10 +442,11 @@ public class LeshanServerParkingLot {
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("My ip="+ip);
+        System.out.println("My ip=" + ip);
 
+        ZmqCommunicator zmq_boy = new ZmqCommunicator();
 
-
+        zmq_boy.SendMessage("REG 1 1 butt");
 
         // Register a service to DNS-SD
         // Create a JmDNS instance
@@ -458,8 +463,6 @@ public class LeshanServerParkingLot {
         // Publish Leshan CoAP Service
         ServiceInfo coapServiceInfo = ServiceInfo.create("_parkingserver._udp.", "P3", LwM2m.DEFAULT_COAP_PORT, "");
         jmdns.registerService(coapServiceInfo);
-
-
 
         // Start Jetty & Leshan
         lwServer.start();
@@ -479,4 +482,21 @@ public class LeshanServerParkingLot {
     }
 
 
+}
+
+class ZmqCommunicator {
+    String port = "5555";
+    ZMQ.Socket socket;
+    ZContext context;
+
+    public ZmqCommunicator() {
+        this.context = new ZContext();
+        this.socket = context.createSocket(ZMQ.REQ);
+        this.socket.connect("tcp://localhost:" + this.port);
+    }
+
+    public void SendMessage(String message) {
+        this.socket.send(message.getBytes(ZMQ.CHARSET), 0);
+        byte[] reply = socket.recv(0);
+    }
 }
