@@ -57,25 +57,24 @@ public class MultipleAxisJoystick extends BaseInstanceEnabler {
             public void run() {
                 Process p = null;
                 try {
+                    //Run the Joystick process
                     String joyStickString = System.getProperty("user.dir")+"/python_code/JoystickControl.py";
                     System.out.println("Trying to run LEDMatrixStatusChange from "+joyStickString);
                     p = Runtime.getRuntime().exec("python "+joyStickString);
-                    //p = Runtime.getRuntime().exec("python /home/chris/IdeaProjects/LegeLand/testText2Spe.py");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
+                //Scanner for stdIn
                 Scanner Errorscanner = new Scanner(p.getErrorStream());
                 Scanner scanner = new Scanner(p.getInputStream());
                 while (scanner.hasNext()) {
-                    //String line2 = Errorscanner.next();
-                    //System.err.println(line2);
-
+                    
                     String line = scanner.next();
                     System.out.println(line);
                     // process the content of line.
                     if(line.matches("Free")){
-
+                        //TODO: This could be propably be a method call to setup a specifc LwM2Mres.
                         LwM2mResource free = new LwM2mResource() {
                             @Override
                             public ResourceModel.Type getType() {
@@ -112,8 +111,11 @@ public class MultipleAxisJoystick extends BaseInstanceEnabler {
 
                             }
                         };
+                        //Make a write request to the parkingSpot object to set the SpotState to "Free"
                         parkingSpot.write( null, 32801,free);
                     }else if(line.matches("Occupied")){
+
+                        //TODO: This could be propably be a method call to setup a specifc LwM2Mres.
                         LwM2mResource occuiped = new LwM2mResource() {
                             @Override
                             public ResourceModel.Type getType() {
@@ -150,6 +152,7 @@ public class MultipleAxisJoystick extends BaseInstanceEnabler {
 
                             }
                         };
+                        //Make a write request to the parkingSpot object to set the SpotState to "Occuiped"
                         parkingSpot.write( null, 32801,occuiped);
                     }
                 } }

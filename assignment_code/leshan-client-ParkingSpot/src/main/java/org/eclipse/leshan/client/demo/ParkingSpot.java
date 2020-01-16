@@ -26,8 +26,7 @@ public class ParkingSpot extends BaseInstanceEnabler {
             );
     // Variables storing current values.
     private String vParkingSpotId = "Default_vParkingSpotId";
-    // Free,Reserved,Occupied
-    private final String[] SpotStates = new String[]{"free","reserved","occupied"};
+    private final String[] SpotStates = new String[]{"free","reserved","occupied"}; // Possible states: Free,Reserved,Occupied
     private String vParkingSpotState = "free";
     private String vLotName = "Default_vLotName";
 
@@ -52,17 +51,21 @@ public class ParkingSpot extends BaseInstanceEnabler {
     public WriteResponse write(ServerIdentity identity, int resourceId, LwM2mResource value) {
         switch (resourceId) {
             case RES_PARKING_SPOT_STATE:
+                //Get the ParkingSpotState and see if it corresponds to one of the 3 legal strings
                 String vParkingSpotState_temp = ((String) value.getValue()).toLowerCase();
                 for (String s: SpotStates)
                 {
-                    if(s.equals(vParkingSpotState_temp)){
+                    if(s.equals(vParkingSpotState_temp)){  
                         vParkingSpotState = vParkingSpotState_temp;
-                        fireResourcesChange(resourceId);
+                        fireResourcesChange(resourceId); //"notify/publish" the resource change
                         try {
-                            Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + vParkingSpotState+"");
+                            //Process p = Runtime.getRuntime().exec("espeak State_changed_to_" + vParkingSpotState+"");
+                            //Setup path for LEDMatrixStatusChange
                             String changeScreenScript = System.getProperty("user.dir") + "/python_code/LEDmatrixStatusChange.py ";
                             System.out.println("Trying to run LEDMatrixStatusChange from "+changeScreenScript);
+
                             switch (vParkingSpotState){
+                                //Depending what the new State is, choose the right color as a parameter for the python script
                                 case "free":
                                     Process p2 = Runtime.getRuntime().exec(changeScreenScript + "G");
                                     Scanner Errorscanner = new Scanner(p2.getErrorStream());
@@ -103,7 +106,7 @@ public class ParkingSpot extends BaseInstanceEnabler {
                         "The following strings can be used as parameters: \""+vParkingSpotState_temp+"\"");
 
             case RES_LOT_NAME:
-                vLotName = (String) value.getValue();
+                vLotName = (String) value.getValue(); //Update LotName
                 fireResourcesChange(resourceId);
                 return WriteResponse.success();
             default:
