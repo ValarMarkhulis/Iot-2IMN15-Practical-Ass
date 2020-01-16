@@ -28,27 +28,6 @@ public class ParkingSpot extends BaseInstanceEnabler {
     // Free,Reserved,Occupied
     private final String[] SpotStates = new String[]{"free","reserved","occupied"};
 
-    @Override
-    public String toString() {
-        return "ParkingSpot{" +
-                "vParkingSpotId='" + vParkingSpotId + '\'' +
-                ", The Spot can have the following States=" + Arrays.toString(SpotStates) +
-                ", vParkingSpotState='" + vParkingSpotState + '\'' +
-                ", vLotName='" + vLotName + '\'' +
-                '}';
-    }
-
-    public String getvParkingSpotId() {
-        return vParkingSpotId;
-    }
-
-    public String getvParkingSpotState() {
-        return vParkingSpotState;
-    }
-
-    public String getvLotName() {
-        return vLotName;
-    }
 
     private String vParkingSpotState = "free";
     private String vLotName = "";
@@ -169,6 +148,28 @@ public class ParkingSpot extends BaseInstanceEnabler {
             vLotName = value;
             fireResourcesChange(RES_LOT_NAME);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ParkingSpot{" +
+                "vParkingSpotId='" + vParkingSpotId + '\'' +
+                ", The Spot can have the following States=" + Arrays.toString(SpotStates) +
+                ", vParkingSpotState='" + vParkingSpotState + '\'' +
+                ", vLotName='" + vLotName + '\'' +
+                '}';
+    }
+
+    public String getvParkingSpotId() {
+        return vParkingSpotId;
+    }
+
+    public String getvParkingSpotState() {
+        return vParkingSpotState;
+    }
+
+    public String getvLotName() {
+        return vLotName;
     }
 
 }

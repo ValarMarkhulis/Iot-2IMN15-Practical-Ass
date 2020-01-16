@@ -22,6 +22,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
+
 public class LeshansServerListener {
 
 
@@ -29,12 +32,18 @@ public class LeshansServerListener {
     LeshanServer lwServer;
     private final String[] whichListener2ImplementArray = new String[]{"registered", "updated", "unregistered"};
     ParkingSpot pS;
+    ZmqCommunicator zmq_boy;
 
     /**
      * @param lwServer
+     * @param zmq_boy
      *
      */
-    public LeshansServerListener(LeshanServer lwServer) {
+    public LeshansServerListener(LeshanServer lwServer, ZmqCommunicator zmq_boy) {
+
+
+        this.zmq_boy = zmq_boy;
+
         this.lwServer = lwServer;
         //Setup 3 registration Listeners which makes 3 observation listeners for the 3 resources:
         //Look for "Parking Spot State" /32700/0
@@ -68,6 +77,10 @@ public class LeshansServerListener {
                     System.out.print("[Whats in \"/32700/0/32801\"] \"" + test.getValue().toString() + "\" - ");
                     // write the new state to the parking lot so it can update the display
                     parkingLot.makeSpotStateChange(test.getValue().toString());
+
+                    //Do the ZMQ message to update a parking spot at the ZMQ server
+                    zmq_boy.SendMessage("REG " + pS.getvParkingSpotId() + " " + pS.getvParkingSpotState() +
+                            " " + pS.getvLotName());
 
 
                     //System.out.println("Testing:"+observation.toString());
@@ -139,9 +152,16 @@ public class LeshansServerListener {
 
                         //Make a new parkingSpot and add it to a new ParkingLot
                         if(pS == null){ //TODO: There should be able to be more parkingSpots.
-                            pS = new ParkingSpot(test.get(32800).getValue().toString()
-                                    ,test.get(32801).getValue().toString(),test.get(32802).getValue().toString());
+                            final String vParkingSpotId = test.get(32800).getValue().toString();
+                            final String vParkingSpotState = test.get(32801).getValue().toString();
+                            final String vLotName = test.get(32802).getValue().toString();
+
+                            pS = new ParkingSpot(vParkingSpotId,vParkingSpotState,vLotName);
                             parkingLot = new ParkingLot(pS);
+
+                            //Do the ZMQ message to register a parking spot at the ZMQ server
+                            zmq_boy.SendMessage("REG " + vParkingSpotId + " " + vParkingSpotState +
+                                    " " + parkingLot.getvLotName());
 
                             try {
                                 //Do a WriteRequest to "Parking Spot Lot name" /32700/0/32802 with the parkingLot "vLotName" name

@@ -25,11 +25,11 @@ public class ParkingSpot extends BaseInstanceEnabler {
                     , RES_LOT_NAME
             );
     // Variables storing current values.
-    private String vParkingSpotId = "Default vParkingSpotId set by Client";
+    private String vParkingSpotId = "Default_vParkingSpotId_set_by_Client";
     // Free,Reserved,Occupied
     private final String[] SpotStates = new String[]{"free","reserved","occupied"};
     private String vParkingSpotState = "free";
-    private String vLotName = "Default vLotName set by Client";
+    private String vLotName = "Default_vLotName_set_by_Client";
 
     public ParkingSpot() {
     }
