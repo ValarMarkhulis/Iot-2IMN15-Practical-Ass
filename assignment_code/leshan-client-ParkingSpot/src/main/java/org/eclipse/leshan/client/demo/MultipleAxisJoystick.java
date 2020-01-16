@@ -53,9 +53,9 @@ public class MultipleAxisJoystick extends BaseInstanceEnabler {
         super();
         this.parkingSpot = parkingSpot;
         Thread joystickReader;
-        System.out.println("Starting the joystick!!!!!!!!!!");
         joystickReader = new Thread(new Runnable() {
-            public void run() {          Process p = null;
+            public void run() {
+                Process p = null;
                 try {
                     String joyStickString = System.getProperty("user.dir")+"/../JoystickControl.py";
                     System.out.println("Trying to run LEDMatrixStatusChange from "+joyStickString);
