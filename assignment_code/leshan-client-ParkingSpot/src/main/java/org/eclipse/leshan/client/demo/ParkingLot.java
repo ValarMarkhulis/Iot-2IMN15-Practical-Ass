@@ -29,8 +29,8 @@ public class ParkingLot extends BaseInstanceEnabler {
                     , RES_FREE
             );
     // Variables storing current values.
-    private String vParkingLotId = "TestId set by Client";
-    private String vLotName = "Default vLotName set by Client";
+    private String vParkingLotId = "TestId_set_by_Client";
+    private String vLotName = "Default_vLotName_set_by_Client";
     private int vCapacity = 1337;
     private int vReservations = 2;
     private int vVehicles = 1;

@@ -462,7 +462,7 @@ public class LeshanServerParkingLot {
         // Start Jetty & Leshan
         lwServer.start();
         server.start();
-        LeshansServerListener LSL = new LeshansServerListener(lwServer);
+        LeshansServerListener LSL = new LeshansServerListener(lwServer, zmq_boy);
         LOG.info("Web server started at {}.", server.getURI());
 
         // De-register on shutdown and stop client.
