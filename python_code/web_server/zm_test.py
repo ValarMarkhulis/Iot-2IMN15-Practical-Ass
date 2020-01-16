@@ -21,11 +21,11 @@ if __name__ == "__main__":
             print("RECEIVED:", message)
             if "REG" in message:
                 components = message.split()
-                spot_id = int(components[1])
-                state = int(components[2])
-                name = components[3].replace("'", "")
+                spot_id = str(components[1]).replace("'", "")
+                state = str(components[2]).replace("'", "")
+                name = str(components[3]).replace("'", "")
                 query = """
-                    INSERT INTO PARKING_SPOTS(id,spot_state,lot_name) VALUES({0}, {1}, '{2}')
+                    INSERT INTO PARKING_SPOTS(id,spot_state,lot_name) VALUES('{0}', '{1}', '{2}')
                     ON CONFLICT(id) DO UPDATE SET
                     spot_state=excluded.spot_state,
                     lot_name=excluded.lot_name

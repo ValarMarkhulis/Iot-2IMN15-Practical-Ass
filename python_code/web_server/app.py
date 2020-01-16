@@ -19,10 +19,10 @@ def home():
 
 @socketio.on('get_cars')
 def handle_message(message):
-    r = query_db("SELECT COUNT(*) FROM PARKING_SPOTS WHERE spot_state=1")[0][0]
+    r = query_db("SELECT COUNT(*) FROM PARKING_SPOTS WHERE spot_state='occupied'")[0][0]
     send(r)
 
 
 if __name__ == '__main__':
-    get_db().execute("CREATE TABLE IF NOT EXISTS PARKING_SPOTS(id int PRIMARY KEY, spot_state int, lot_name varchar(128))")
+    get_db().execute("CREATE TABLE IF NOT EXISTS PARKING_SPOTS(id varchar(32) PRIMARY KEY, spot_state varchar(8), lot_name varchar(128))")
     socketio.run(app)

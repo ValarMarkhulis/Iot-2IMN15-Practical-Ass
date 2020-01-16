@@ -446,7 +446,7 @@ public class LeshanServerParkingLot {
 
         ZmqCommunicator zmq_boy = new ZmqCommunicator();
 
-        zmq_boy.SendMessage("REG 1 1 butt");
+        zmq_boy.SendMessage("REG 1 occupied butt");
 
         // Register a service to DNS-SD
         // Create a JmDNS instance
