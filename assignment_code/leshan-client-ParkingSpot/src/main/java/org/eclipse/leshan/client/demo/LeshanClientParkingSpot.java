@@ -339,7 +339,6 @@ public class LeshanClientParkingSpot {
         }
 
 
-        /*
         System.out.println("JmDNS running and trying to find a server..");
         // Create a JmDNS instance
         final JmDNS jmdns = JmDNS.create();
@@ -361,8 +360,6 @@ public class LeshanClientParkingSpot {
 
         }
 
-
-
         String temp_URL = "localhost";
         try {
             temp_URL = Arrays.toString(new String[]{p.getHostAddresses()[0]});
@@ -379,15 +376,10 @@ public class LeshanClientParkingSpot {
         }
 
 
-
-
         //get serverURI
         if(serverURI != null){
             serverURI = "coap://"+temp_URL+":" + LwM2m.DEFAULT_COAP_PORT;
         }
-        */
-
-        serverURI = "coap://"+"raspberrypiMark.local"+":" + LwM2m.DEFAULT_COAP_PORT;
 
         /*Our code ended*/
 
